@@ -1,0 +1,247 @@
+#include "iostream"
+#include "vector"
+#include "algorithm"
+using namespace std;
+
+template <typename T>
+class SingleList {
+    class Node {
+    public:
+        T value;
+        Node *next;
+
+        Node(T elem = T(), Node *next = nullptr) {
+            this->value=elem;
+            this->next=next;
+        }
+    };
+
+    int size;
+    Node *head;
+
+public:
+    SingleList() {
+        size=0;
+        head= nullptr;
+    }
+
+    int length() {
+        return size;
+    }
+
+    void pushFront(T elem) {
+        if(head== nullptr)
+            head = new Node(elem);
+        else {
+            Node *temp = new Node(elem, head);
+            head = temp;
+        }
+        size++;
+    }
+
+    void popFront() {
+        if(size <= 0)
+            throw out_of_range("SLL is empty!");
+        else {
+            Node *temp = head->next;
+            delete head;
+            head=temp;
+            size--;
+        }
+    }
+
+    void clearAll() {
+        while(size!=0)
+            popFront();
+    }
+
+    void insertAt(int pos, T elem) {
+        if(pos < 0 || pos >= size)
+            throw out_of_range("Index of element is out of range!");
+        else {
+            if(head== nullptr) {
+                head = new Node(elem);
+            }
+            else if(pos==0) {
+                Node *cur = new Node(elem, head);
+                head = cur;
+            }
+            else if(pos==size-1) {
+                Node *cur = new Node(elem);
+                Node *temp = head;
+                while(temp->next!= nullptr) {
+                    temp=temp->next;
+                }
+                temp->next=cur;
+            }
+            else {
+                Node *cur = new Node(elem);
+                Node *temp = head;
+                Node *temp2;
+                int c = 0;
+                while (c < pos - 1) {
+                    temp = temp->next;
+                    c++;
+                }
+                temp2 = temp->next;
+                temp->next = cur;
+                cur->next = temp2;
+            }
+            size++;
+        }
+    }
+
+    void deleteAt(int pos) {
+        if(pos < 0 || pos >= size)
+            throw out_of_range("Index of element is out of range!");
+        else {
+            if(pos==0) {
+                Node *cur = head->next;
+                delete head;
+                head = cur;
+            }
+            else if(pos==size-1) {
+                int c=0;
+                Node *temp = head;
+                while(c!=size-2) {
+                    temp=temp->next;
+                    c++;
+                }
+                Node *temp2 = temp->next;
+                delete temp2;
+                temp->next= nullptr;
+            }
+            else {
+                Node *temp = head;
+                Node *temp2;
+                Node *cur;
+                int c = 0;
+                while (c < pos - 1) {
+                    temp = temp->next;
+                    c++;
+                }
+                cur = temp->next;
+                temp2 =cur->next;
+                delete cur;
+                temp->next=temp2;
+            }
+            size--;
+        }
+    }
+
+    void updateAt(int pos, T elem) {
+        if(pos < 0 || pos >= size)
+            throw out_of_range("Index of element is out of range!");
+        else {
+            if(pos==0) {
+                head->value = elem;
+            }
+            else {
+                Node *temp = head;
+                int c = 0;
+                while (c < pos) {
+                    temp = temp->next;
+                    c++;
+                }
+                temp->value=elem;
+            }
+        }
+    }
+
+    void display() {
+        Node *cur = head;
+        cout<<"SLL: [ ";
+        while(cur!= nullptr) {
+            cout<<cur->value<<" ";
+            cur=cur->next;
+        }
+        cout<<"]\nLength: "<<size<<"\n\n";
+    }
+
+    void insertionSort(vector<float> &arr, int n) {
+        float key;
+        int i, j;
+        for(i=1; i<n; i++) {
+            key = arr[i];
+            j=i-1;
+
+            while (j>=0 && arr[j] > key) {
+                arr[j+1] = arr[j];
+                j=j-1;
+            }
+            arr[j+1] = key;
+        }
+    }
+
+    void bucketSort() {
+        vector<float> bucket[10];
+        int bi;
+
+        Node *cur = head;
+        while (cur!= nullptr) {
+            bi = 10 * cur->value;
+            bucket[bi].push_back(cur->value);
+            cur = cur->next;
+        }
+        /*for(int i=0; i < size; i++) {
+            bi = 10*arr[i];
+            bucket[bi].push_back(arr[i]);
+        }*/
+
+        int len;
+        for(int i=0; i<10; i++) {
+            len = bucket[i].size();
+            if(len>1) {
+                insertionSort(bucket[i], len);
+            }
+        }
+
+        int index=0;
+        for(int i=0; i<10; i++) {
+
+
+            for(int j=0; j < bucket[i].size(); j++) {
+                updateAt(index, bucket[i][j]);
+                //arr[index] = bucket[i][j];
+                index++;
+            }
+        }
+    }
+};
+
+
+
+int main() {
+    SingleList<float> s;
+    s.pushFront(0.78);
+    s.pushFront(0.17);
+    s.pushFront(0.39);
+    s.pushFront(0.26);
+    s.pushFront(0.72);
+    s.pushFront(0.94);
+    s.pushFront(0.21);
+    s.pushFront(0.12);
+    s.pushFront(0.23);
+    s.pushFront(0.68);
+
+    //s.popFront();
+
+    s.insertAt(2,999);
+    s.display();
+
+    s.deleteAt(5);
+    s.display();
+
+    s.updateAt(2,666);
+    s.display();
+
+    s.deleteAt(2);
+    s.display();
+
+    s.bucketSort();
+    s.display();
+
+
+
+    return 0;
+}
